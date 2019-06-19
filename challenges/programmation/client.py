@@ -7,7 +7,7 @@ server_conn.connect((HOST, PORT))
 print("Connexion établie avec le serveur sur le port {}".format(PORT))
 msg_send = b""
 
-while msg_send != b"fin":
+while msg_send != b"quit":
     msg_send = input("> ")
     msg_send = msg_send.encode()
     server_conn.send(msg_send)
