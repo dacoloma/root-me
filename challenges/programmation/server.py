@@ -13,6 +13,7 @@ CHANNEL = '#root-me_challenge'
 BOT = 'Candy'
 NICKNAME = 'Danonino'
 
+input('Opening socket')
 # Open a socket 
 IRC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -22,30 +23,42 @@ def irc_conn():
     
 # Send data
 def send_data(command):
-    IRC.send(command + '\n').encode()
+    IRC.send("{} \n".format(command).encode())
 
 # Login
 def login(nickname):
-    send_data("USER %s %s %s %s" % nickname nickname nickname "Daniel")
-    send_data("NICK %s" % nickname)
+    send_data('USER {} {} {} Daniel'.format(nickname, nickname, nickname))
+    send_data("NICK {}".format(nickname))
 
 # Join channel
 def join(channel):
-    send_data("JOIN %s" % channel)
+    send_data("JOIN {}".format(channel))
 
-def get_msg():
-    msg = IRC.recv(1024)
-    if (msg.find('PING') != -1):
-        send_data('PONG %s' % msg.split()[1])
-    return msg
-
+input('Connecting to host')
 irc_conn()
+
+input('Logging in')
 login(NICKNAME)
+
+input('Joining channel')
 join(CHANNEL)
 
-while 1:
-    msg = IRC.recv(1024)
+input('start')
+send_data("PRIVMSG {} !ep1".format(CHANNEL))
+option = ""
+while option != "quit":
+    msg = IRC.recv(1024).decode()
+
+    if msg.find('PING') != -1:
+        send_data("PONG {}".format(msg.split()[1]))
     print(msg)
+    if "PRIVMSG" in msg and CHANNEL in msg:
+        resp = retour_au_college(msg.split()[1])
+        send_data("PRIVMSG {} !ep1 -rep {} ".format(CHANNEL, resp))
+    option = (input("> "))
+# while 1:
+
+
 IRC.close()
 
 
