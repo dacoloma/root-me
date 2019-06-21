@@ -1,10 +1,11 @@
-import socket 
+from math import sqrt
+import socket
 
 def backtocollege(entry):
     if len(entry) >= 3:
-        val = entry[1].split('/')
+        val = entry.split('/')
         a = sqrt(int(val[0]))
-        return (a * int(val[1]))
+        return (round(a * int(val[1]), 2))
 
 # Parameters
 HOST = 'irc.root-me.org'
@@ -13,7 +14,6 @@ CHANNEL = '#root-me_challenge'
 BOT = 'candy'
 NICKNAME = 'Danonino'
 
-# input('Opening socket')
 # Open a socket 
 IRC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -27,12 +27,12 @@ def send_data(command):
 
 # Login
 def login(nickname):
-    send_data('USER {} {} {} Daniel'.format(nickname, nickname, nickname))
-    send_data("NICK {}".format(nickname))
+    send_data(f"USER {nickname} {nickname} {nickname} Daniel")
+    send_data(f"NICK {nickname}")
 
 # Join channel
 def join(channel):
-    send_data("JOIN {}".format(channel))
+    send_data(f"JOIN {channel}")
 
 # input('Connecting to host')
 irc_conn()
@@ -47,26 +47,18 @@ input('start')
 
 option = ""
 while option != "quit":
-    msg = IRC.recv(1024).decode()
-    # if "PRIVMSG" in msg and CHANNEL in msg:
+    msg = IRC.recv(1024).decode('utf-8', 'ignore')
     print(msg)
-
     if msg.find('PING') != -1:
-        send_data("PONG {}".format(msg.split()[1]))
+        send_data(f"PONG {msg.split()[1]}")
     
     option = input("Press Enter or type start or type quit: ")
     if option == "start":
-        print("PRIVMSG candy !ep1\n".format(NICKNAME,BOT))
-        input("> ")
-        send_data("PRIVMSG candy !ep1\r".format(NICKNAME, BOT))
-        input("> ")
-        msg = IRC.recv(1024).decode()
-        if "PRIVMSG" in msg and CHANNEL in msg:
-            resp = backtocollege(msg.split()[1])
-            print("Response: {}".format(resp))
-            send_data("PRIVMSG candy !ep1 -rep {} \r".format(resp))
-
-
+        send_data("PRIVMSG candy !ep1\r")
+        msg = IRC.recv(1024).decode('utf-8', 'ignore')
+        resp = msg.split(':')
+        resp = backtocollege(resp[len(resp) - 1])
+        send_data(f"PRIVMSG candy !ep1 -rep {resp} \r")
 
 IRC.close()
 
