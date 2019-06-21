@@ -1,6 +1,6 @@
 import socket 
 
-def retour_au_college(entry):
+def backtocollege(entry):
     if len(entry) >= 3:
         val = entry[1].split('/')
         a = sqrt(int(val[0]))
@@ -10,10 +10,10 @@ def retour_au_college(entry):
 HOST = 'irc.root-me.org'
 PORT = 6667
 CHANNEL = '#root-me_challenge'
-BOT = 'Candy'
+BOT = 'candy'
 NICKNAME = 'Danonino'
 
-input('Opening socket')
+# input('Opening socket')
 # Open a socket 
 IRC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -34,33 +34,40 @@ def login(nickname):
 def join(channel):
     send_data("JOIN {}".format(channel))
 
-input('Connecting to host')
+# input('Connecting to host')
 irc_conn()
 
-input('Logging in')
+# input('Logging in')
 login(NICKNAME)
 
-input('Joining channel')
+# input('Joining channel')
 join(CHANNEL)
 
 input('start')
-send_data("PRIVMSG {} !ep1".format(CHANNEL))
+
 option = ""
 while option != "quit":
     msg = IRC.recv(1024).decode()
+    # if "PRIVMSG" in msg and CHANNEL in msg:
+    print(msg)
 
     if msg.find('PING') != -1:
         send_data("PONG {}".format(msg.split()[1]))
-    print(msg)
-    if "PRIVMSG" in msg and CHANNEL in msg:
-        resp = retour_au_college(msg.split()[1])
-        send_data("PRIVMSG {} !ep1 -rep {} ".format(CHANNEL, resp))
-    option = (input("> "))
-# while 1:
+    
+    option = input("Press Enter or type start or type quit: ")
+    if option == "start":
+        print("PRIVMSG candy !ep1\n".format(NICKNAME,BOT))
+        input("> ")
+        send_data("PRIVMSG candy !ep1\r".format(NICKNAME, BOT))
+        input("> ")
+        msg = IRC.recv(1024).decode()
+        if "PRIVMSG" in msg and CHANNEL in msg:
+            resp = backtocollege(msg.split()[1])
+            print("Response: {}".format(resp))
+            send_data("PRIVMSG candy !ep1 -rep {} \r".format(resp))
+
 
 
 IRC.close()
-
-
 
 print("Closing connection")
