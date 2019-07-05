@@ -6,7 +6,7 @@ HOST = 'irc.root-me.org'
 PORT = 6667
 CHANNEL = '#root-me_challenge'
 BOT = 'candy'
-NICKNAME = 'Danonino'
+NICKNAME = 'Danoninobot'
 
 # Open a socket 
 IRC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,7 +17,8 @@ def irc_conn():
     
 # Send data
 def send_data(command):
-    IRC.send("{} \n".format(command).encode())
+    print("{} \n".format(command).encode().replace(b'\r\n', b''))
+    IRC.send("{} \n".format(command).encode().replace(b'\r\n', b''))
 
 # Login
 def login(nickname):
@@ -48,20 +49,16 @@ while option != "quit":
     
     option = input("Press Enter or type start or type quit: ")
     if option == "start":
-        #Start challenge
-        send_data("PRIVMSG candy !ep3\r")
-        
-        #Receive bot response
+        send_data(f"PRIVMSG {BOT} !ep3")
         msg = IRC.recv(1024).decode('utf-8', 'ignore')
         print(msg)
-
-        resp = msg.split(':')
-        resp = resp[len(resp) - 1]
-        print(resp)
-        allo = codecs.decode(resp, 'rot_13')
-
-        print(allo)
-        send_data(f"PRIVMSG candy !ep3 -rep {allo} \r")
+        resp = msg.split(":")
+        resp = resp[-1]
+        decode = codecs.decode(resp, "rot13")
+        print(f"RESP : {resp.encode()} |")
+        print(f"DECODE : {decode.encode()} |")
+        # option = input("type quit: ")
+        send_data(f"PRIVMSG {BOT} !ep3 -rep {decode}")
 
 IRC.close()
 
